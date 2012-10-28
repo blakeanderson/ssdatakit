@@ -13,6 +13,7 @@
 
 // Accessing the Main Context
 + (NSManagedObjectContext *)mainContext;
++ (NSManagedObjectContext *)childContext;
 + (BOOL)hasMainContext;
 
 // Configuring the Persistent Store
@@ -42,6 +43,7 @@
 
 // Manipulation
 - (void)save;
+- (void)saveWithChildContext:(NSManagedObjectContext *)context;
 - (void)delete;
 
 // Resetting

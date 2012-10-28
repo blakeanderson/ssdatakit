@@ -22,7 +22,15 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 	if (!__managedObjectContext) {
 		__managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		__managedObjectContext.persistentStoreCoordinator = [self persistentStoreCoordinator];
+    __managedObjectContext.undoManager = nil;
 	}
+	return __managedObjectContext;
+}
+
++ (NSManagedObjectContext *)childContext {
+	NSManagedObjectContext *tempContext = [[NSManagedObjectContext alloc]initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+  tempContext.parentContext = [self mainContext];
+  tempContext.undoManager = nil;
 	return __managedObjectContext;
 }
 
@@ -242,6 +250,23 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 	[self.managedObjectContext deleteObject:self];
 }
 
+- (void)saveWithChildContext:(NSManagedObjectContext *)context
+{
+  NSError *error;
+  if (![context save:&error])
+  {
+    // handle error
+  }
+  
+  // save parent to disk asynchronously
+  [context.parentContext performBlock:^{
+    NSError *error;
+    if (![context.parentContext save:&error])
+    {
+      // handle error
+    }
+  }];
+}
 
 #pragma mark - Resetting
 
