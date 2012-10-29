@@ -31,7 +31,7 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 	NSManagedObjectContext *tempContext = [[NSManagedObjectContext alloc]initWithConcurrencyType:NSPrivateQueueConcurrencyType];
   tempContext.parentContext = [self mainContext];
   tempContext.undoManager = nil;
-	return __managedObjectContext;
+	return tempContext;
 }
 
 
@@ -252,18 +252,21 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 
 - (void)saveWithChildContext:(NSManagedObjectContext *)context
 {
+  NSLog(@"Saved");
   NSError *error;
   if (![context save:&error])
   {
     // handle error
+     NSLog(@"Error: %@", error);
   }
   
   // save parent to disk asynchronously
-  [context.parentContext performBlock:^{
+  [context.parentContext performBlockAndWait:^{
     NSError *error;
     if (![context.parentContext save:&error])
     {
       // handle error
+      NSLog(@"Error: %@", error);
     }
   }];
 }
