@@ -52,7 +52,7 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 		NSDictionary *storeOptions = [self persistentStoreOptions];
 		[persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:storeOptions error:&error];
 		if (error) {
-			NSLog(@"[SSDataKit] Failed to add persistent store: %@ %@", error, error.userInfo);
+			CLS_LOG(@"[SSDataKit] Failed to add persistent store: %@ %@", error, error.userInfo);
 		}
 	});
 	
@@ -252,12 +252,11 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 
 - (void)saveWithChildContext:(NSManagedObjectContext *)context
 {
-  NSLog(@"Saved");
   NSError *error;
   if (![context save:&error])
   {
     // handle error
-     NSLog(@"Error: %@", error);
+     CLS_LOG(@"Save Child Context: %@", error);
   }
   
   // save parent to disk asynchronously
@@ -266,7 +265,7 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
     if (![context.parentContext save:&error])
     {
       // handle error
-      NSLog(@"Error: %@", error);
+      CLS_LOG(@"Save Parent Context: %@", error);
     }
   }];
 }
