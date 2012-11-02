@@ -23,6 +23,7 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 		__managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 		__managedObjectContext.persistentStoreCoordinator = [self persistentStoreCoordinator];
     __managedObjectContext.undoManager = nil;
+    __managedObjectContext.retainsRegisteredObjects = YES;
 	}
 	return __managedObjectContext;
 }
@@ -255,23 +256,18 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
   NSError *error;
   if (![context save:&error])
   {
-    // handle error
-     CLS_LOG(@"Save Child Context: %@", error);
+     NSLog(@"Save Child Context: %@", error);
   }
   
-  // save parent to disk asynchronously
-  [context.parentContext performBlockAndWait:^{
-    NSError *error;
-    if (![context.parentContext save:&error])
-    {
-      // handle error
-      CLS_LOG(@"Save Parent Context: %@", error);
-    }
-  }];
+  NSError *error2;
+  if (![context.parentContext save:&error2])
+  {
+    NSLog(@"Save Parent Context: %@", error2);
+  }
 }
 
 #pragma mark - Resetting
-
+ 
 + (void)resetPersistentStore {
 	__managedObjectContext = nil;
 	NSURL *url = [self persistentStoreURL];	
