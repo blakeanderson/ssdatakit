@@ -297,18 +297,6 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
   }
 }
 
-#pragma mark - Resetting
- 
-+ (void)resetPersistentStore {
-	__managedObjectContext = nil;
-	NSURL *url = [self persistentStoreURL];	
-	NSPersistentStoreCoordinator *psc = [SSManagedObject persistentStoreCoordinator];
-	if ([psc removePersistentStore:psc.persistentStores.lastObject error:nil]) {
-		[[NSFileManager defaultManager] removeItemAtURL:url error:nil];
-		[psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:[SSManagedObject persistentStoreOptions] error:nil];
-	}
-}
-
 #pragma mark - NSCoding
 
 - (id)initWithCoder:(NSCoder *)decoder {
