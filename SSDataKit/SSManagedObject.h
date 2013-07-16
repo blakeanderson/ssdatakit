@@ -3,7 +3,7 @@
 //  SSDataKit
 //
 //  Created by Sam Soffes on 10/23/11.
-//  Copyright (c) 2011 Sam Soffes. All rights reserved.
+//  Copyright (c) 2011-2013 Sam Soffes. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,11 +11,35 @@
 
 @interface SSManagedObject : NSManagedObject <NSCoding>
 
-#pragma mark - Accessing the Main Context
+#pragma mark - Accessing the application contexts
 
-+ (NSManagedObjectContext *)mainContext;
-+ (NSManagedObjectContext *)childContext;
-+ (BOOL)hasMainContext;
+/**
+ Created as the "root" managed object context. This context has no parent
+ and instead has the `persistentStoreCoordinator` set. Use this to perform
+ any background processing in your Core Data stack. Make sure to pull data into
+ descendant contexts if you save directly here.
+
+ Changes saved to any direct descendants of this context are automatically
+ pulled up and saved to the persistent store.
+ */
++ (NSManagedObjectContext *)privateQueueContext;
++ (BOOL)hasPrivateQueueContext;
+
+/**
+Created as a child of the `privateQueueContext`. Use this context on the main
+thread or to update your interface.
+
+Changes saved here are automatically reflected in the `privateQueueContext`.
+ */
++ (NSManagedObjectContext *)mainQueueContext;
++ (BOOL)hasMainQueueContext;
+
+
+/**
+ Synonymous with the `mainQueueContext` methods.
+ */
++ (NSManagedObjectContext *)mainContext DEPRECATED_ATTRIBUTE;
++ (BOOL)hasMainContext DEPRECATED_ATTRIBUTE;
 
 
 #pragma mark - Configuring the Persistent Store
@@ -27,6 +51,8 @@
 + (void)setManagedObjectModel:(NSManagedObjectModel *)model;
 + (NSURL *)persistentStoreURL;
 + (void)setPersistentStoreURL:(NSURL *)url;
++ (NSString *)persistentStoreType;
++ (void)setPersistentStoreType:(NSString *)persistentStoreType;
 
 
 #pragma mark - Resetting the Presistent Store
@@ -55,6 +81,11 @@
 - (id)initWithContext:(NSManagedObjectContext *)context;
 
 
+#pragma mark - Object ID resolution
+
+- (NSManagedObjectID *)permanentObjectID;
+
+
 #pragma mark -  Reflection
 
 - (NSArray *)attributeKeys;
@@ -67,7 +98,6 @@
 #pragma mark -  Manipulation
 
 - (void)save;
-- (void)saveWithChildContext:(NSManagedObjectContext *)context;
 - (void)delete;
 
 
