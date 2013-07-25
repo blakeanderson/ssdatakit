@@ -49,6 +49,8 @@ Changes saved here are automatically reflected in the `privateQueueContext`.
 + (void)setPersistentStoreOptions:(NSDictionary *)options;
 + (NSManagedObjectModel *)managedObjectModel;
 + (void)setManagedObjectModel:(NSManagedObjectModel *)model;
++ (NSURL *)staticManagedObjectModel;
++ (void)setStaticManagedObjectModel:(NSManagedObjectModel *)model;
 + (NSURL *)persistentStoreURL;
 + (void)setPersistentStoreURL:(NSURL *)url;
 + (NSString *)persistentStoreType;

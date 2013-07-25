@@ -12,6 +12,7 @@ static id __contextSaveObserver = nil;
 static NSManagedObjectContext *__privateQueueContext = nil;
 static NSManagedObjectContext *__mainQueueContext = nil;
 static NSManagedObjectModel *__managedObjectModel = nil;
+static NSManagedObjectModel *__staticManagedObjectModel = nil;
 static NSURL *__persistentStoreURL = nil;
 static NSString *__persistentStoreType = nil;
 static NSDictionary *__persistentStoreOptions = nil;
@@ -123,9 +124,21 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 
 + (NSManagedObjectModel *)managedObjectModel {
 	if (!__managedObjectModel) {
+		
 		// Default model
 		NSManagedObjectModel *model = [NSManagedObjectModel mergedModelFromBundles:nil];
-
+		
+		if ([self staticManagedObjectModel]){
+			
+			NSMutableArray *managedObjectModels = [[NSMutableArray alloc] init];
+			
+			//[managedObjectModels addObject:model];
+			[managedObjectModels addObject:[self staticManagedObjectModel]];
+			
+			__managedObjectModel = [NSManagedObjectModel modelByMergingModels:managedObjectModels];
+			
+		}
+		
 		// Ensure a model is loaded
 		if (!model) {
 			[[NSException exceptionWithName:@"SSManagedObjectMissingModel" reason:@"You need to provide a managed model." userInfo:nil] raise];
@@ -140,6 +153,17 @@ static NSString *const kURIRepresentationKey = @"URIRepresentation";
 
 + (void)setManagedObjectModel:(NSManagedObjectModel *)model {
 	__managedObjectModel = model;
+}
+
+
++ (NSManagedObjectModel*)staticManagedObjectModel
+{
+	return __staticManagedObjectModel;
+}
+
++ (void)setStaticManagedObjectModel:(NSManagedObjectModel *)model
+{
+	__staticManagedObjectModel = model;
 }
 
 
