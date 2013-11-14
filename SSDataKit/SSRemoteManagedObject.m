@@ -81,6 +81,23 @@
 	return [results lastObject];
 }
 
++ (NSArray*)existingObjects {
+	return [self existingObjectsWithContext:nil];
+}
+
++ (NSArray*)existingObjectsWithContext:(NSManagedObjectContext *)context  {
+	// Default to the main context
+	if (!context) {
+		context = [self mainQueueContext];
+	}
+	
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	fetchRequest.entity = [self entityWithContext:context];
+	
+	NSArray *results = [context executeFetchRequest:fetchRequest error:nil];
+	return results;
+}
+
 
 + (id)objectWithDictionary:(NSDictionary *)dictionary {
 	return [self objectWithDictionary:dictionary context:nil];

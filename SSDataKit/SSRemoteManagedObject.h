@@ -33,6 +33,14 @@
 + (id)existingObjectWithRemoteID:(NSString *)remoteID context:(NSManagedObjectContext *)context;
 
 /**
+ Finds all existing objects of the current class entity. Therefore, this should only be
+ called on a subclass. `nil` is returned if the object is not found. If a context is not specified, the `mainContext`
+ will be used.
+ */
++ (NSArray*)existingObjects;
++ (NSArray*)existingObjectsWithContext:(NSManagedObjectContext *)context;
+
+/**
  Find an existing object with a given remote ID. The class' entity is used in the find. Therefore, this should only be
  called on a subclass. The object will be created if it is not found. If a context is not specified, the `mainContext`
  will be used.
