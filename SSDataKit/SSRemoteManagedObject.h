@@ -39,6 +39,7 @@
  */
 + (NSArray*)existingObjects;
 + (NSArray*)existingObjectsWithContext:(NSManagedObjectContext *)context;
++ (void)removeExistingObjects;
 
 /**
  Find an existing object with a given remote ID. The class' entity is used in the find. Therefore, this should only be

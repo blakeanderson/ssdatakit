@@ -98,6 +98,19 @@
 	return results;
 }
 
++ (void)removeExistingObjects {
+	NSArray *items = [self existingObjects];
+	
+	NSError *error;
+	for (NSManagedObject *managedObject in items) {
+		[[SSManagedObject mainQueueContext] deleteObject:managedObject];
+		NSLog(@"%@ object deleted", [self entityName]);
+	}
+	if (![[SSManagedObject mainQueueContext] save:&error]) {
+		NSLog(@"Error deleting - error");
+	}
+}
+
 
 + (id)objectWithDictionary:(NSDictionary *)dictionary {
 	return [self objectWithDictionary:dictionary context:nil];
