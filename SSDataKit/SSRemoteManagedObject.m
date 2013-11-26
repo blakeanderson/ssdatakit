@@ -81,6 +81,75 @@
 	return [results lastObject];
 }
 
++ (id)objectWithAttribute:(NSString *)attributeName value:(id)value {
+	return [self objectWithAttribute:attributeName value:value context:nil];
+}
+
++ (id)objectWithAttribute:(NSString *)attributeName value:(id)value context:(NSManagedObjectContext *)context {
+	
+	// If there isn't a suitable attribute name, we won't find the object. Return nil.
+	if (!attributeName ||
+		[attributeName length] == 0) {
+		return nil;
+	}
+	
+	// If there isn't a suitable value, we won't find the object. Return nil.
+	if (!value){
+		return nil;
+	}
+	// Default to the main context
+	if (!context) {
+		context = [self mainQueueContext];
+	}
+	
+	// Look up the object
+	SSRemoteManagedObject *object = [self existingObjectWithAttribute:attributeName value:value context:context];
+	
+	// If the object doesn't exist, create it
+	if (!object) {
+		object = [[self alloc] initWithContext:context];
+		[object setValue:value forKey:attributeName];
+	}
+	
+	// Return the fetched or new object
+	return object;
+}
+
++ (id)existingObjectWithAttribute:(NSString *)attributeName value:(id)value {
+	return [self existingObjectWithAttribute:attributeName value:value context:nil];
+}
+
++ (id)existingObjectWithAttribute:(NSString *)attributeName value:(id)value context:(NSManagedObjectContext *)context {
+	
+	// If there isn't a suitable attribute name, we won't find the object. Return nil.
+	if (!attributeName ||
+		[attributeName length] == 0) {
+		return nil;
+	}
+	
+	// If there isn't a suitable value, we won't find the object. Return nil.
+	if (!value){
+		return nil;
+	}
+	
+	// Default to the main context
+	if (!context) {
+		context = [self mainQueueContext];
+	}
+	
+	// Create the fetch request for the ID
+	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+	fetchRequest.entity = [self entityWithContext:context];
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:@"%@ = %@", attributeName, value];
+	fetchRequest.fetchLimit = 1;
+	
+	// Execute the fetch request
+	NSArray *results = [context executeFetchRequest:fetchRequest error:nil];
+	
+	// Return the object
+	return [results lastObject];
+}
+
 + (NSArray*)existingObjects {
 	return [self existingObjectsWithContext:nil];
 }

@@ -32,6 +32,23 @@
 + (id)existingObjectWithRemoteID:(NSString *)remoteID;
 + (id)existingObjectWithRemoteID:(NSString *)remoteID context:(NSManagedObjectContext *)context;
 
+
+/**
+ Find an existing object with the given value for the given attribute name. The class' entity is used in the find. Therefore, this should only be
+ called on a subclass. The object will be created if it is not found. If a context is not specified, the `mainContext`
+ will be used.
+ **/
++ (id)objectWithAttribute:(NSString *)attributeName value:(id)value;
++ (id)objectWithAttribute:(NSString *)attributeName value:(id)value context:(NSManagedObjectContext *)context;
+
+/**
+ Find an existing object with the given value for the given attribute name. The class' entity is used in the find. Therefore, this should only be
+ called on a subclass. `nil` is returned if the object is not found. If a context is not specified, the `mainContext`
+ will be used.
+ **/
++ (id)existingObjectWithAttribute:(NSString *)attributeName value:(id)value;
++ (id)existingObjectWithAttribute:(NSString *)attributeName value:(id)value context:(NSManagedObjectContext *)context;
+
 /**
  Finds all existing objects of the current class entity. Therefore, this should only be
  called on a subclass. `nil` is returned if the object is not found. If a context is not specified, the `mainContext`
