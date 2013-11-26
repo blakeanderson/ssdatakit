@@ -80,6 +80,14 @@
 - (BOOL)isRemote;
 
 /**
+ Sometimes the remote ID for a object payload is not on the top level. This will unpack the remote ID from the dictionary, and return it. This method should be overrident by subclasses whose payloads are unconventional and their remote ID is not at tht top level. If it is not overriden, the default implementation will try to find and return a remote ID from the top level of the payload.
+
+ @param dictionary The object payload.
+ @return The remote ID for the object.
+ **/
++ (NSString *)unpackRemoteIDFromDictionary:(NSDictionary *)dictionary;
+
+/**
  Parse a date in a dictionary from the server. A NSNumber containing the number of seconds since 1970 or a NSString
  containing an ISO8601 string are the only valid values for `dateStringOrDateNumber`.
  */

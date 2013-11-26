@@ -125,7 +125,7 @@
 	}
 	
 	// Extract the remoteID from the dictionary
-	NSString *remoteID = [dictionary objectForKey:@"_id"];
+	NSString *remoteID = [[self class] unpackRemoteIDFromDictionary:dictionary];
 	
 	// Find object by remoteID
 	SSRemoteManagedObject *object = [[self class] objectWithRemoteID:remoteID context:context];
@@ -153,7 +153,7 @@
 	}
 	
 	// Extract the remoteID from the dictionary
-	NSString *remoteID = [dictionary objectForKey:@"_id"];
+	NSString *remoteID = [[self class] unpackRemoteIDFromDictionary:dictionary];
 	
 	// Find object by remoteID
 	SSRemoteManagedObject *object = [[self class] existingObjectWithRemoteID:remoteID context:context];
@@ -170,7 +170,7 @@
 
 - (void)unpackDictionary:(NSDictionary *)dictionary {
 	if (!self.isRemote) {
-		self.remoteID = [dictionary objectForKey:@"_id"];
+		self.remoteID = [[self class] unpackRemoteIDFromDictionary:dictionary];
 	}
 	
 	if ([self respondsToSelector:@selector(setCreatedAt:)]) {
@@ -196,11 +196,13 @@
 	return NO;
 }
 
++ (NSString *)unpackRemoteIDFromDictionary:(NSDictionary *)dictionary {
+	return [dictionary objectForKey:@"_id"];
+}
 
 - (BOOL)isRemote {
 	return self.remoteID.integerValue > 0;
 }
-
 
 + (NSDate *)parseDate:(id)dateStringOrDateNumber {
 	// Return nil if nil is given
