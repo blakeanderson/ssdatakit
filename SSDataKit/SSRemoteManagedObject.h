@@ -102,7 +102,7 @@
  @param dictionary The object payload.
  @return The remote ID for the object.
  **/
-+ (NSString *)unpackRemoteIDFromDictionary:(NSDictionary *)dictionary;
++ (NSString *)unpackRemoteIdFromDictionary:(NSDictionary *)dictionary;
 
 /**
  Parse a date in a dictionary from the server. A NSNumber containing the number of seconds since 1970 or a NSString
