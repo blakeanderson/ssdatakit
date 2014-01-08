@@ -140,7 +140,7 @@
 	// Create the fetch request for the ID
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	fetchRequest.entity = [self entityWithContext:context];
-	fetchRequest.predicate = [NSPredicate predicateWithFormat:@"%@ = %@", attributeName, value];
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:@"%K = %@", attributeName, value];
 	fetchRequest.fetchLimit = 1;
 	
 	// Execute the fetch request
@@ -211,6 +211,7 @@
 + (id)existingObjectWithDictionary:(NSDictionary *)dictionary {
 	return [self existingObjectWithDictionary:dictionary context:nil];
 }
+
 
 + (id)existingObjectWithDictionary:(NSDictionary *)dictionary context:(NSManagedObjectContext *)context {
 	
