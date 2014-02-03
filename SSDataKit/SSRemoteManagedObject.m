@@ -241,12 +241,14 @@
 		self.remoteID = [[self class] unpackRemoteIdFromDictionary:dictionary];
 	}
 	
-	if ([self respondsToSelector:@selector(setCreatedAt:)]) {
-		self.createdAt = [[self class] parseDate:dictionary[@"created_at"]];
+	if ([self respondsToSelector:@selector(setCreatedAt:)] &&
+		[dictionary objectForKey:@"createdAt"]) {
+		self.createdAt = [[self class] parseMongoDate:dictionary[@"createdAt"]];
 	}
 	
-	if ([self respondsToSelector:@selector(setUpdatedAt:)]) {
-		self.updatedAt = [[self class] parseDate:dictionary[@"updated_at"]];
+	if ([self respondsToSelector:@selector(setUpdatedAt:)] &&
+		[dictionary objectForKey:@"updatedAt"]) {
+		self.updatedAt = [[self class] parseMongoDate:dictionary[@"updatedAt"]];
 	}
 }
 
@@ -256,7 +258,7 @@
 		return YES;
 	}
 	
-	NSDate *newDate = [[self class] parseDate:dictionary[@"updated_at"]];
+	NSDate *newDate = [[self class] parseMongoDate:dictionary[@"updatedAt"]];
 	if (newDate && [self.updatedAt compare:newDate] == NSOrderedAscending) {
 		return YES;
 	}
@@ -272,75 +274,19 @@
 	return self.remoteID.integerValue > 0;
 }
 
-+ (NSDate *)parseDate:(id)dateStringOrDateNumber {
-	// Return nil if nil is given
-	if (!dateStringOrDateNumber || dateStringOrDateNumber == [NSNull null]) {
-		return nil;
-	}
-	
-	// Parse number
-	if ([dateStringOrDateNumber isKindOfClass:[NSNumber class]]) {
-		return [NSDate dateWithTimeIntervalSince1970:[dateStringOrDateNumber doubleValue]];
-	}
-	
-	// Parse string
-	else if ([dateStringOrDateNumber isKindOfClass:[NSString class]]) {
-		// ISO8601 Parser borrowed from SSToolkit. http://sstoolk.it
-		NSString *iso8601 = dateStringOrDateNumber;
-		if (!iso8601) {
-			return nil;
-		}
-		
-		const char *str = [iso8601 cStringUsingEncoding:NSUTF8StringEncoding];
-		char newStr[25];
-		
-		struct tm tm;
-		size_t len = strlen(str);
-		if (len == 0) {
-			return nil;
-		}
-		
-		// UTC
-		if (len == 20 && str[len - 1] == 'Z') {
-			strncpy(newStr, str, len - 1);
-			strncpy(newStr + len - 1, "+0000", 5);
-		}
-		
-		//Milliseconds parsing
-		else if (len == 24 && str[len - 1] == 'Z') {
-			strncpy(newStr, str, len - 1);
-			strncpy(newStr, str, len - 5);
-			strncpy(newStr + len - 5, "+0000", 5);
-		}
-		
-		// Timezone
-		else if (len == 25 && str[22] == ':') {
-			strncpy(newStr, str, 22);
-			strncpy(newStr + 22, str + 23, 2);
-		}
-		
-		// Poorly formatted timezone
-		else {
-			strncpy(newStr, str, len > 24 ? 24 : len);
-		}
-		
-		// Add null terminator
-		newStr[sizeof(newStr) - 1] = 0;
-		
-		if (strptime(newStr, "%FT%T%z", &tm) == NULL) {
-			return nil;
-		}
-		
-		time_t t;
-		t = mktime(&tm);
-		
-		return [NSDate dateWithTimeIntervalSince1970:t];
-	}
-	
-	NSAssert1(NO, @"[SSRemoteManagedObject] Failed to parse date: %@", dateStringOrDateNumber);
-	return nil;
++ (NSDate *)parseMongoDate:(NSString *)dateString {
+    
+    NSDateFormatter *rfc3339DateFormatter = [[NSDateFormatter alloc] init];
+    
+    NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+    
+    [rfc3339DateFormatter setLocale:enUSPOSIXLocale];
+    [rfc3339DateFormatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'"];
+    [rfc3339DateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    
+    NSDate *date = [rfc3339DateFormatter dateFromString:dateString];
+    return date;
 }
-
 
 + (NSArray *)defaultSortDescriptors {
 	return [NSArray arrayWithObjects:
